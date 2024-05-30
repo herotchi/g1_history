@@ -28,17 +28,22 @@ class G1History
     displayYearSelector() {
         const yearEl = document.getElementById('year');
         
-        const options = [];
-        options.push(`<option value="">---</option>`);
-        for (let i = 0; i < this.yearData.length; i++) {
-            console.log(this.yearData[i]);
-            options.push(`<option value="${this.yearData[i]['year']}">${this.yearData[i]['year']}: ${this.yearData[i]['award']}</option>`);
-        }
-        yearEl.innerHTML = options.join('');
+        this.yearData.forEach(entry => {
+            let option = document.createElement('option');
+            option.value = entry.year;
+            option.text = `${entry.year}年：${entry.award}`;
+            yearEl.add(option);
+        });
 
         yearEl.addEventListener('change' , (event) => {
-            this.searchWords.year = event.target.value;
-            this.displayRaceSelector(this.searchWords.year);
+            if (event.target.value) {
+                this.searchWords.year = event.target.value;
+                this.displayRaceSelector(this.searchWords.year);
+            } else {
+                // 空白が選択された場合レースプルダウンをリセット
+                const raceEl = document.getElementById('race');
+                raceEl.innerHTML = `<option value="">---</option>`
+            }
         });
     }
 
@@ -46,17 +51,18 @@ class G1History
         await this.fetchRaceData(year);
         const raceEl = document.getElementById('race');
 
-        const options = [];
-        options.push(`<option value="">---</option>`);
-        for (let i = 0; i < this.racesData.races.length; i++) {
-            console.log(this.racesData.races[i]);
-            options.push(`<option value="${this.racesData.races[i]['name']}">${this.racesData.races[i]['name']}: ${this.racesData.races[i]['winner']}</option>`);
-        }
-        raceEl.innerHTML = options.join('');
+        this.racesData.races.forEach(entry => {
+            let option = document.createElement('option');
+            option.value = entry.name;
+            option.text = `${entry.name}：${entry.winner}`;
+            raceEl.add(option);
+        });
 
         raceEl.addEventListener('change' , (event) => {
-            this.searchWords.race = event.target.value;
-            alert(`${this.searchWords.year}:${this.searchWords.race}`);
+            if (event.target.value) {
+                this.searchWords.race = event.target.value;
+                alert(`${this.searchWords.year}:${this.searchWords.race}`);
+            }
         });
     }
 
