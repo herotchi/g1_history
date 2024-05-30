@@ -24,6 +24,11 @@
         <script src="{{ asset('js/toastr.min.js') }}"></script>
     </head>
     <body>
+        <nav class="navbar bg-dark border-bottom border-body mb-3" data-bs-theme="dark">
+            <div class="container-fluid">
+                <span class="navbar-brand mb-0 h1">G1ヒストリー</span>
+            </div>
+        </nav>
         <div class="container">
             <main>
                 <div class="row g-3">
