@@ -14,6 +14,15 @@ class G1History
     async init() {
         await this.fetchYearData();
         this.displayYearSelector();
+
+        const raceEl = document.getElementById('race');
+        raceEl.addEventListener('change' , (event) => {
+            if (event.target.value) {
+                console.log(event.target.value);
+                this.searchWords.race = event.target.value;
+                this.searchYouTube();
+            }
+        });
     }
 
     async fetchYearData() {
@@ -36,33 +45,32 @@ class G1History
         });
 
         yearEl.addEventListener('change' , (event) => {
-            if (event.target.value) {
+            if (validateYear(event.target.value)) {
                 this.searchWords.year = event.target.value;
                 this.displayRaceSelector(this.searchWords.year);
             } else {
-                // 空白が選択された場合レースプルダウンをリセット
+                // 空白が選択された場合、レースのプルダウンをリセット
                 const raceEl = document.getElementById('race');
-                raceEl.innerHTML = `<option value="">---</option>`
+                raceEl.innerHTML = `<option value="">---</option>`;
             }
         });
     }
 
+    validateYear(year) {
+
+        return true;
+    };
+
     async displayRaceSelector(year) {
         await this.fetchRaceData(year);
         const raceEl = document.getElementById('race');
+        raceEl.innerHTML = `<option value="">---</option>`
 
         this.racesData.races.forEach(entry => {
             let option = document.createElement('option');
             option.value = entry.name;
             option.text = `${entry.name}：${entry.winner}`;
             raceEl.add(option);
-        });
-
-        raceEl.addEventListener('change' , (event) => {
-            if (event.target.value) {
-                this.searchWords.race = event.target.value;
-                alert(`${this.searchWords.year}:${this.searchWords.race}`);
-            }
         });
     }
 
@@ -73,6 +81,22 @@ class G1History
             this.racesData = tmp.find(entry => entry.year == year);
         } catch (error) {
             console.log(error);
+        }
+    }
+
+    async searchYouTube()
+    {
+        try {
+            const response = await fetch(`./api/search?year=${this.searchWords.year}&race=${this.searchWords.race}`);
+            const data = await response.json();
+            console.log(data);
+            if (data.errors) {
+                console.log("エラーあり");
+            } else {
+                console.log("エラーなし");
+            }
+        } catch (error) {
+            //console.log(error);
         }
     }
 }
