@@ -45,21 +45,16 @@ class G1History
         });
 
         yearEl.addEventListener('change' , (event) => {
-            if (validateYear(event.target.value)) {
+            if (this.validateYear(event.target.value)) {
                 this.searchWords.year = event.target.value;
                 this.displayRaceSelector(this.searchWords.year);
             } else {
-                // 空白が選択された場合、レースのプルダウンをリセット
+                // 入力エラーや空白が選択された場合、レースのプルダウンをリセット
                 const raceEl = document.getElementById('race');
                 raceEl.innerHTML = `<option value="">---</option>`;
             }
         });
     }
-
-    validateYear(year) {
-
-        return true;
-    };
 
     async displayRaceSelector(year) {
         await this.fetchRaceData(year);
@@ -98,6 +93,27 @@ class G1History
         } catch (error) {
             //console.log(error);
         }
+    }
+
+    validateYear(year) {
+        // 空でないかどうかをチェックする
+        if (year === null || year === undefined || year === '') {
+            return false;
+        }
+        // 数値であるかどうかをチェックする
+        if (isNaN(year)) {
+            return false;
+        }
+        // 整数であるかどうかをチェックする
+        if (!Number.isInteger(Number(year))) {
+            return false;
+        }
+        // year.jsonに含まれる年代がチェックする
+        if (!this.yearData.some(item => {item.year === Number(year)})) {
+            return false;
+        }
+
+        return true;
     }
 }
 
