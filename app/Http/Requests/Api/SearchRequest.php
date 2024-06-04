@@ -52,17 +52,23 @@ class SearchRequest extends FormRequest
                 if ($validator->errors()->has('year') === false) {
         
                     $races = [];
+                    $data = [];
                     $jsonPath = public_path('json/race.json');
                     if (!file_exists($jsonPath)) {
                         return response()->json(['error' => 'File not found'], 404);
                     }
 
                     $json = file_get_contents($jsonPath);
-                    $data = array_filter(json_decode($json, true), function($tmp) {
-                        return $tmp['year'] === 2020;
+                    $filteredArrays = array_filter(json_decode($json, true), function($tmp) use ($input) {
+                        return $tmp['year'] === intval($input['year']);
                     });
 
-                    foreach ($data[0]['races'] as $race) {
+                    // filterされた配列はキーが動的なので整形する
+                    foreach($filteredArrays as $filterdArray) {
+                        $data = $filterdArray;
+                    }
+
+                    foreach ($data['races'] as $race) {
                         $races[] = $race['name'];
                     }
 
