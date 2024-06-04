@@ -8,17 +8,24 @@ class G1History
         };
         this.yearData = null;
         this.racesData = null;
+
+        this.idList = null;
     }
 
 
     async init() {
+        // iframe Player APIを非同期で読み込み
+        var tag = document.createElement('script');
+        tag.src = "https://www.youtube.com/iframe_api";
+        var firstScriptTag = document.getElementsByTagName('script')[0];
+        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
         await this.fetchYearData();
         this.displayYearSelector();
 
         const raceEl = document.getElementById('race');
         raceEl.addEventListener('change' , (event) => {
             if (event.target.value) {
-                console.log(event.target.value);
                 this.searchWords.race = event.target.value;
                 this.searchYouTube();
             }
@@ -84,15 +91,37 @@ class G1History
         try {
             const response = await fetch(`./api/search?year=${this.searchWords.year}&race=${this.searchWords.race}`);
             const data = await response.json();
-            console.log(data);
             if (data.errors) {
                 console.log("エラーあり");
             } else {
                 console.log("エラーなし");
+                this.idList = data.idList;
+                this.setVideos();
             }
         } catch (error) {
             //console.log(error);
         }
+    }
+
+    async setVideos() {
+        window.onYouTubeIframeAPIReady = this.onYouTubeIframeAPIReady.bind(this);
+
+        const playlist = document.getElementById('playlist');
+        console.log(this.idList);
+        for (let i = 0; i < this.idList.length; i++) {
+            const newDiv = document.createElement('div');
+            newDiv.id = `player${i}`;
+            newDiv.className = 'player mt-3 col-md-12';
+            playlist.appendChild(newDiv);
+            this.onYouTubeIframeAPIReady(`player${i}`, this.idList[i]);
+        }
+    }
+
+    onYouTubeIframeAPIReady(id, videoId) {
+        // プレイヤーを初期化
+        this.player = new YT.Player(id, {
+            videoId: videoId, // 適切なYouTube動画IDに置き換えてください
+        });
     }
 
     validateYear(year) {
@@ -109,7 +138,9 @@ class G1History
             return false;
         }
         // year.jsonに含まれる年代がチェックする
-        if (!this.yearData.some(item => {item.year === Number(year)})) {
+        if (!this.yearData.some(item => {
+            return item.year === Number(year)
+        })) {
             return false;
         }
 
@@ -118,3 +149,20 @@ class G1History
 }
 
 new G1History(document.getElementById('container')).init();
+
+/*var tag = document.createElement('script');
+
+      tag.src = "https://www.youtube.com/iframe_api";
+      var firstScriptTag = document.getElementsByTagName('script')[0];
+      firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);*/
+
+      // 3. This function creates an <iframe> (and YouTube player)
+      //    after the API code downloads.
+      /*var player;
+      function onYouTubeIframeAPIReady() {
+        player = new YT.Player('player', {
+          height: '360',
+          width: '640',
+          videoId: 'M7lc1UVf-VE',
+        });
+      }*/

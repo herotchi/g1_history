@@ -44,6 +44,8 @@
                             <option value="">---</option>
                         </select>
                     </div>
+                    <div id="playlist">
+                    </div>
                 </div>
             </main>
         </div>
