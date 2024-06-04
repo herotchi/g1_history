@@ -26,6 +26,12 @@ class G1History
         const raceEl = document.getElementById('race');
         raceEl.addEventListener('change' , (event) => {
             if (event.target.value) {
+                // 既に存在するiframeタグを削除する
+                const playListEl = document.getElementById('playlist');
+                while (playListEl.firstChild) {
+                    playListEl.removeChild(playListEl.firstChild);
+                }
+
                 this.searchWords.race = event.target.value;
                 this.searchYouTube();
             }
@@ -120,7 +126,8 @@ class G1History
     onYouTubeIframeAPIReady(id, videoId) {
         // プレイヤーを初期化
         this.player = new YT.Player(id, {
-            videoId: videoId, // 適切なYouTube動画IDに置き換えてください
+            videoId: videoId,
+            //width: 360
         });
     }
 
