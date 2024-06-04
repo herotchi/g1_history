@@ -27,9 +27,9 @@ class G1History
         raceEl.addEventListener('change' , (event) => {
             if (event.target.value) {
                 // 既に存在するiframeタグを削除する
-                const playListEl = document.getElementById('playlist');
-                while (playListEl.firstChild) {
-                    playListEl.removeChild(playListEl.firstChild);
+                const playlistEl = document.getElementById('playlist');
+                while (playlistEl.firstChild) {
+                    playlistEl.removeChild(playlistEl.firstChild);
                 }
 
                 this.searchWords.race = event.target.value;
@@ -117,17 +117,27 @@ class G1History
         for (let i = 0; i < this.idList.length; i++) {
             const newDiv = document.createElement('div');
             newDiv.id = `player${i}`;
-            newDiv.className = 'player mt-3 col-md-12';
+            //newDiv.className = 'player mt-3 col-md-12';
+            newDiv.className = 'player mt-3';
             playlist.appendChild(newDiv);
             this.onYouTubeIframeAPIReady(`player${i}`, this.idList[i]);
         }
     }
 
     onYouTubeIframeAPIReady(id, videoId) {
+
+        const playlistEl = document.getElementById('playlist');
+        const style = getComputedStyle(playlistEl);
+        const paddingLeft = parseFloat(style.paddingLeft);
+        const paddingRight = parseFloat(style.paddingRight);
+    
+        // clientWidth から padding を除いた幅を計算
+        const widthWithoutPadding = playlistEl.clientWidth - paddingLeft - paddingRight;
+
         // プレイヤーを初期化
         this.player = new YT.Player(id, {
             videoId: videoId,
-            //width: 360
+            width: widthWithoutPadding
         });
     }
 
