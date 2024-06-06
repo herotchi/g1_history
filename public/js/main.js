@@ -7,8 +7,7 @@ class G1History
             'race': null
         };
         this.yearData = null;
-        this.racesData = null;
-
+        this.raceData = null;
         this.idList = null;
     }
 
@@ -25,7 +24,8 @@ class G1History
 
         const raceEl = document.getElementById('race');
         raceEl.addEventListener('change' , (event) => {
-            if (event.target.value) {
+            if (event.target.value !== '' && this.validateRace(event.target.value)) {
+                raceEl.classList.remove('is-invalid');
                 // 既に存在するiframeタグを削除する
                 const playlistEl = document.getElementById('playlist');
                 while (playlistEl.firstChild) {
@@ -34,6 +34,13 @@ class G1History
 
                 this.searchWords.race = event.target.value;
                 this.searchYouTube();
+            } else {
+                if (event.target.value === '') {
+                    raceEl.classList.remove('is-invalid');
+                } else {
+                    raceEl.classList.add('is-invalid');
+                    this.showToast('入力エラーです。');
+                }
             }
         });
     }
@@ -43,7 +50,7 @@ class G1History
             const response = await fetch('./json/year.json');
             this.yearData = await response.json();
         } catch (error) {
-            console.log(error);
+            this.showToast('読み込みに失敗しました。');
         }
     }
 
@@ -58,13 +65,20 @@ class G1History
         });
 
         yearEl.addEventListener('change' , (event) => {
-            if (this.validateYear(event.target.value)) {
+            if (event.target.value !== '' && this.validateYear(event.target.value)) {
+                yearEl.classList.remove('is-invalid');
                 this.searchWords.year = event.target.value;
                 this.displayRaceSelector(this.searchWords.year);
             } else {
-                // 入力エラーや空白が選択された場合、レースのプルダウンをリセット
+                // 入力エラーや空白が選択された場合、子のレースのプルダウンをリセット
                 const raceEl = document.getElementById('race');
                 raceEl.innerHTML = `<option value="">---</option>`;
+                if (event.target.value === '') {
+                    yearEl.classList.remove('is-invalid');
+                } else {
+                    yearEl.classList.add('is-invalid');
+                    this.showToast('入力エラーです。');
+                }
             }
         });
     }
@@ -72,9 +86,9 @@ class G1History
     async displayRaceSelector(year) {
         await this.fetchRaceData(year);
         const raceEl = document.getElementById('race');
-        raceEl.innerHTML = `<option value="">---</option>`
+        raceEl.innerHTML = `<option value="">---</option>`;
 
-        this.racesData.races.forEach(entry => {
+        this.raceData.races.forEach(entry => {
             let option = document.createElement('option');
             option.value = entry.name;
             option.text = `${entry.name}：${entry.winner}`;
@@ -86,9 +100,9 @@ class G1History
         try {
             const response = await fetch('./json/race.json');
             const tmp = await response.json();
-            this.racesData = tmp.find(entry => entry.year == year);
+            this.raceData = tmp.find(entry => entry.year == year);
         } catch (error) {
-            console.log(error);
+            this.showToast('読み込みに失敗しました。');
         }
     }
 
@@ -98,14 +112,13 @@ class G1History
             const response = await fetch(`./api/search?year=${this.searchWords.year}&race=${this.searchWords.race}`);
             const data = await response.json();
             if (data.errors) {
-                console.log("エラーあり");
+                this.showToast('入力エラーです。');
             } else {
-                console.log("エラーなし");
                 this.idList = data.idList;
                 this.setVideos();
             }
         } catch (error) {
-            //console.log(error);
+            this.showToast('通信に失敗しました。');
         }
     }
 
@@ -113,11 +126,9 @@ class G1History
         window.onYouTubeIframeAPIReady = this.onYouTubeIframeAPIReady.bind(this);
 
         const playlist = document.getElementById('playlist');
-        console.log(this.idList);
         for (let i = 0; i < this.idList.length; i++) {
             const newDiv = document.createElement('div');
             newDiv.id = `player${i}`;
-            //newDiv.className = 'player mt-3 col-md-12';
             newDiv.className = 'player mt-3';
             playlist.appendChild(newDiv);
             this.onYouTubeIframeAPIReady(`player${i}`, this.idList[i]);
@@ -143,7 +154,7 @@ class G1History
 
     validateYear(year) {
         // 空でないかどうかをチェックする
-        if (year === null || year === undefined || year === '') {
+        if (year === null || year === undefined) {
             return false;
         }
         // 数値であるかどうかをチェックする
@@ -154,8 +165,8 @@ class G1History
         if (!Number.isInteger(Number(year))) {
             return false;
         }
-        // year.jsonに含まれる年代がチェックする
-        if (!this.yearData.some(item => {
+        // year.jsonに含まれる年代かチェックする
+        if (year !== '' && !this.yearData.some(item => {
             return item.year === Number(year)
         })) {
             return false;
@@ -163,23 +174,35 @@ class G1History
 
         return true;
     }
+
+    validateRace(race) {
+        // 空でないかどうかをチェックする
+        if (race === null || race === undefined) {
+            return false;
+        }
+
+        // 文字列かどうかチェックする
+        if (typeof race !== 'string') {
+            return false;
+        }
+
+        // 指定した年に含まれるレースかチェックする
+        if (race !== '' && !this.raceData.races.some(item => {
+            return item.name === race
+        })) {
+            return false;
+        }
+
+        return true;
+    }
+
+    showToast(message) {
+        const toastEl = document.getElementById('toast');
+        const toast = new bootstrap.Toast(toastEl);
+        const element = toastEl.querySelector('.toast-body');
+        element.textContent  = message;
+        toast.show();
+    }
 }
 
 new G1History(document.getElementById('container')).init();
-
-/*var tag = document.createElement('script');
-
-      tag.src = "https://www.youtube.com/iframe_api";
-      var firstScriptTag = document.getElementsByTagName('script')[0];
-      firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);*/
-
-      // 3. This function creates an <iframe> (and YouTube player)
-      //    after the API code downloads.
-      /*var player;
-      function onYouTubeIframeAPIReady() {
-        player = new YT.Player('player', {
-          height: '360',
-          width: '640',
-          videoId: 'M7lc1UVf-VE',
-        });
-      }*/

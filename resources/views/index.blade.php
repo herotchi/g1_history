@@ -49,6 +49,17 @@
                 </div>
             </main>
         </div>
+
+        <div class="toast-container position-fixed top-0 end-0 p-3">
+            <div id="toast" class="toast text-bg-danger" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="3000">
+                <div class="d-flex" data-bs-theme="dark">
+                    <div class="toast-body">
+                    </div>
+                    <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast" aria-label="閉じる"></button>
+                </div>
+            </div>
+        </div>
+
         <script src="{{ asset('js/main.js') }}"></script>
     </body>
 </html>
