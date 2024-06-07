@@ -7,9 +7,9 @@
         <title>{{ config('app.name') }}</title>
 
         <!-- favicon -->
-        {{--<link rel="shortcut icon" href="{{ asset('favicon.ico') }}">
-        <link rel="apple-touch-icon" href="{{ asset('img/Herotchi_CMS.png') }}">
-        <link rel="icon" type="image/png" href="{{ asset('img/Herotchi_CMS.png') }}">--}}
+        <link rel="shortcut icon" href="{{ asset('favicon.ico') }}">
+        <link rel="apple-touch-icon" href="{{ asset('favicon.png') }}">
+        <link rel="icon" type="image/png" href="{{ asset('favicon.png') }}">
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">
@@ -23,10 +23,10 @@
         <script src="{{ asset('js/bootstrap.bundle.min.js') }}"></script>
         <script src="{{ asset('js/toastr.min.js') }}"></script>
     </head>
-    <body>
+    <body class=" bg-success">
         <nav class="navbar bg-dark border-bottom border-body mb-3" data-bs-theme="dark">
             <div class="container-fluid">
-                <span class="navbar-brand mb-0 h1">G1ヒストリー</span>
+                <span class="navbar-brand mb-0 h1 text-warning">{{ config('app.name') }}</span>
             </div>
         </nav>
         <div class="container">
