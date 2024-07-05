@@ -48,6 +48,9 @@
                     </div>
                 </div>
             </main>
+            <footer class="my-1 pt-4 text-muted text-center text-small">
+                <p class="mb-1">&copy; 2024− へろっちシマウマ～ず</p>
+            </footer>
         </div>
 
         <div class="toast-container position-fixed top-0 end-0 p-3">
